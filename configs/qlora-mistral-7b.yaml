@@ -1,0 +1,37 @@
+# QLoRA fine-tune: Mistral 7B v0.3 with 4-bit quantization (single 24GB GPU friendly).
+run_name: "mistral-7b-qlora-v1"
+base_model: "mistralai/Mistral-7B-v0.3"
+dataset_path: "./data/instructions.json"
+text_field: "text"
+val_ratio: 0.05
+chat_template: "chatml"
+
+lora:
+  r: 32
+  lora_alpha: 64
+  lora_dropout: 0.05
+  target_modules: ["q_proj", "k_proj", "v_proj", "o_proj", "gate_proj", "up_proj", "down_proj"]
+  bias: "none"
+  task_type: "CAUSAL_LM"
+
+quant:
+  enabled: true
+  bits: 4
+  compute_dtype: "bfloat16"
+
+train:
+  output_dir: "./outputs/mistral-7b-qlora-v1"
+  num_epochs: 2
+  per_device_batch_size: 4
+  gradient_accumulation_steps: 4
+  learning_rate: 2.0e-4
+  max_seq_length: 2048
+  gradient_checkpointing: true
+  mixed_precision: "bf16"
+  warmup_ratio: 0.03
+  logging_steps: 10
+  save_steps: 200
+  eval_steps: 200
+  seed: 42
+
+eval_benchmarks: ["domain_qa"]

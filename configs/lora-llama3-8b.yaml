@@ -1,0 +1,35 @@
+# LoRA fine-tune: Llama 3 8B on a domain instruction dataset.
+run_name: "llama3-8b-domain-v1"
+base_model: "meta-llama/Meta-Llama-3-8B"
+dataset_path: "./data/instructions.json"
+text_field: "text"
+val_ratio: 0.05
+chat_template: "llama3"
+
+lora:
+  r: 16
+  lora_alpha: 32
+  lora_dropout: 0.05
+  target_modules: ["q_proj", "k_proj", "v_proj", "o_proj", "gate_proj", "up_proj", "down_proj"]
+  bias: "none"
+  task_type: "CAUSAL_LM"
+
+quant:
+  enabled: false
+
+train:
+  output_dir: "./outputs/llama3-8b-domain-v1"
+  num_epochs: 3
+  per_device_batch_size: 2
+  gradient_accumulation_steps: 8
+  learning_rate: 2.0e-4
+  max_seq_length: 2048
+  gradient_checkpointing: true
+  mixed_precision: "bf16"
+  warmup_ratio: 0.03
+  logging_steps: 10
+  save_steps: 200
+  eval_steps: 200
+  seed: 42
+
+eval_benchmarks: ["domain_qa", "general_knowledge"]
